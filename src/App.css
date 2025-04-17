@@ -15,10 +15,15 @@
 
 .chess-board {
   display: grid;
-  grid-template-columns: repeat(4, 100px);
-  grid-template-rows: repeat(8, 100px);
+  grid-template-columns: repeat(8, 100px);
+  grid-template-rows: repeat(4, 100px);
   gap: 5px;
   margin: 20px;
+}
+
+.game-info {
+  grid-column: span 8;
+  background-color: lightcyan; /* Optional: Different color for visibility */
 }
 
 .board-row {
@@ -74,7 +79,7 @@
   color: white;
 }
 
-.piece.mark {
+.piece.mask {
   background-color: green;
   color: white;
 }
