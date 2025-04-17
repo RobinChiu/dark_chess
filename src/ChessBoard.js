@@ -302,7 +302,14 @@ const handlePieceClick = (row, col) => {
 
 const renderPiece = (row, col) => {
   const piece = board[row][col];
-  if (!piece) return null;
+  if (!piece) return (
+    <div
+      className={`empty`}
+      onClick={() => handlePieceClick(row, col)}
+    >
+    </div>
+  )
+
   const isFlipped = flippedPieces.has(`${row},${col}`);
   let player = 'mark'
   if (isFlipped) {
