@@ -14,6 +14,11 @@ const ChessBoard = () => {
     initializeBoard();
   }, []);
 
+  const pieceNumber = {
+    '將': 1, '士': 2, '象': 3, '車': 4, '馬': 5, '包': 6, '卒': 7, 
+    '帥': 1, '仕': 2, '相': 3, '俥': 4, '傌': 5, '炮': 6, '兵': 7 
+  }
+
   const initializeBoard = () => {
     const pieceTypes = ['將', '仕', '相', '車', '馬', '砲', '兵'];
     const blackPieceCounts = { '將': 1, '士': 2, '象': 2, '車': 2, '馬': 2, '包': 2, '卒': 5 };
@@ -95,82 +100,148 @@ const checkForWinner = () => {
 };
 
 const isValidMove = (startRow, startCol, endRow, endCol) => {
-  const piece = board[startRow][startCol];
-  if (!piece) return false;
+  const piece1 = board[startRow][startCol];
+  const piece2 = board[endRow][endCol]
+  if (!piece1) return false;
 
   const rowDiff = endRow - startRow;
   const colDiff = endCol - startCol;
-
-  switch (piece.type) {
-    case '將':
-    case '帥':
-      // Generals can only move within their respective palaces
-      if (piece.player === 'red') {
-        return (endRow >= 0 && endRow <= 2) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1);
-      } else {
-        return (endRow >= 7 && endRow <= 9) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1);
-      }
-    case '仕':
-      // Advisors can only move within their respective palaces
-      if (piece.player === 'red') {
-        return (endRow >= 0 && endRow <= 2) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1);
-      } else {
-        return (endRow >= 7 && endRow <= 9) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1);
-      }
-    case '相':
-      // Elephants cannot jump over pieces
-      if (Math.abs(rowDiff) !== 2 || Math.abs(colDiff) !== 2) return false;
-      const elephantRow = startRow + rowDiff / 2;
-      const elephantCol = startCol + colDiff / 2;
-      return !board[elephantRow][elephantCol];
-    case '車':
-      // Rooks can move any number of squares along a rank or file
-      if (rowDiff !== 0 && colDiff !== 0) return false;
-      const stepRow = rowDiff !== 0 ? (rowDiff > 0 ? 1 : -1) : 0;
-      const stepCol = colDiff !== 0 ? (colDiff > 0 ? 1 : -1) : 0;
-      for (let i = 1; i < Math.abs(rowDiff) + Math.abs(colDiff); i++) {
-        if (board[startRow + stepRow * i][startCol + stepCol * i]) return false;
-      }
+  
+  // move up, down, left, right
+  if ((Math.abs(rowDiff) === 1 && colDiff===0) || (Math.abs(colDiff) === 1 && rowDiff===0)) {
+    // piece2 is empty
+    if(!piece2) {
       return true;
-    case '馬':
-      // Knights move in an L-shape
-      if (!((Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 1) || (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 2))) return false;
-      const knightRow = startRow + (rowDiff > 0 ? (rowDiff === 2 ? 1 : -1) : 0);
-      const knightCol = startCol + (colDiff > 0 ? (colDiff === 2 ? 1 : -1) : 0);
-      return !board[knightRow][knightCol];
-    case '砲':
-      // Cannons can move any number of squares along a rank or file, but must jump over exactly one piece to capture
-      if (rowDiff !== 0 && colDiff !== 0) return false;
-      const stepRowCannon = rowDiff !== 0 ? (rowDiff > 0 ? 1 : -1) : 0;
-      const stepColCannon = colDiff !== 0 ? (colDiff > 0 ? 1 : -1) : 0;
-      let jumpCount = 0;
-      for (let i = 1; i < Math.abs(rowDiff) + Math.abs(colDiff); i++) {
-        if (board[startRow + stepRowCannon * i][startCol + stepColCannon * i]) jumpCount++;
-      }
-      if (jumpCount === 1) {
-        // Check if the end position has an opponent's piece
-        const endPiece = board[endRow][endCol];
-        return endPiece && endPiece.player !== piece.player;
-      }
-      return jumpCount === 0;
-    case '兵':
-      // Pawns can only move forward and capture diagonally after crossing the river
-      if (piece.player === 'red') {
-        if (endRow < 4) {
-          return rowDiff === 1 && colDiff === 0;
-        } else {
-          return (rowDiff === 1 && colDiff === 0) || (rowDiff === 1 && Math.abs(colDiff) === 1);
-        }
-      } else {
-        if (endRow >= 4) {
-          return rowDiff === -1 && colDiff === 0;
-        } else {
-          return (rowDiff === -1 && colDiff === 0) || (rowDiff === -1 && Math.abs(colDiff) === 1);
-        }
-      }
-    default:
+    // piece1 and piece2 same player
+    } else if (piece1.player===piece2.player) {
       return false;
+    // compare the piece1 and piece2 number
+    } else  {
+      let number1 = pieceNumber[piece1.type]
+      let number2 = pieceNumber[piece2.type]
+      if(number1===7 && number2===1) {
+        return true;
+      }
+      if(number1===1 && number2===7) {
+        return false;
+      }
+      if((number1 <= number2)) {
+        return true;
+      }
+    }
   }
+  // check 包, 炮
+  if(piece1.type==='包' || piece1.type==='炮'){
+    if(rowDiff===0) {
+      let count = 0
+      let start = startCol
+      let end = endCol
+      if(startCol>endCol){
+        start = endCol
+        end = startCol
+      }
+      for(let i=start; i<end; i++) {
+        if(!board[startRow][i]) 
+          count++;
+      }
+      if(count===3)
+        return true;
+    }
+    if(colDiff===0) {
+      let count = 0
+      let start = startRow
+      let end = endRow
+      if(startRow>endRow){
+        start = endRow
+        end = startRow
+      }
+      for(let i=start; i<end; i++) {
+        if(!board[i][startCol]) 
+          count++;
+      }
+      if(count===3)
+        return true;
+    }
+  }
+
+  return false
+
+  // switch (piece1.type) {
+  //   case '將':
+  //   case '帥':
+  //     // Generals can only move within their respective palaces
+  //     if (piece.player === 'red') {
+  //       return (endRow >= 0 && endRow <= 2) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1);
+  //     } else {
+  //       return (endRow >= 7 && endRow <= 9) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) <= 1 && Math.abs(colDiff) <= 1);
+  //     }
+  //   case '仕':
+  //   case '士':
+  //     // Advisors can only move within their respective palaces
+  //     if (piece.player === 'red') {
+  //       return (endRow >= 0 && endRow <= 2) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1);
+  //     } else {
+  //       return (endRow >= 7 && endRow <= 9) && (endCol >= 1 && endCol <= 3) && (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 1);
+  //     }
+  //   case '相':
+  //   case '象':
+  //     // Elephants cannot jump over pieces
+  //     if (Math.abs(rowDiff) !== 2 || Math.abs(colDiff) !== 2) return false;
+  //     const elephantRow = startRow + rowDiff / 2;
+  //     const elephantCol = startCol + colDiff / 2;
+  //     return !board[elephantRow][elephantCol];
+  //   case '車':
+  //   case '俥':
+  //     // Rooks can move any number of squares along a rank or file
+  //     if (rowDiff !== 0 && colDiff !== 0) return false;
+  //     const stepRow = rowDiff !== 0 ? (rowDiff > 0 ? 1 : -1) : 0;
+  //     const stepCol = colDiff !== 0 ? (colDiff > 0 ? 1 : -1) : 0;
+  //     for (let i = 1; i < Math.abs(rowDiff) + Math.abs(colDiff); i++) {
+  //       if (board[startRow + stepRow * i][startCol + stepCol * i]) return false;
+  //     }
+  //     return true;
+  //   case '馬':
+  //   case '傌':
+  //     // Knights move in an L-shape
+  //     if (!((Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 1) || (Math.abs(rowDiff) === 1 && Math.abs(colDiff) === 2))) return false;
+  //     const knightRow = startRow + (rowDiff > 0 ? (rowDiff === 2 ? 1 : -1) : 0);
+  //     const knightCol = startCol + (colDiff > 0 ? (colDiff === 2 ? 1 : -1) : 0);
+  //     return !board[knightRow][knightCol];
+  //   case '包':
+  //   case '炮':
+  //     // Cannons can move any number of squares along a rank or file, but must jump over exactly one piece to capture
+  //     if (rowDiff !== 0 && colDiff !== 0) return false;
+  //     const stepRowCannon = rowDiff !== 0 ? (rowDiff > 0 ? 1 : -1) : 0;
+  //     const stepColCannon = colDiff !== 0 ? (colDiff > 0 ? 1 : -1) : 0;
+  //     let jumpCount = 0;
+  //     for (let i = 1; i < Math.abs(rowDiff) + Math.abs(colDiff); i++) {
+  //       if (board[startRow + stepRowCannon * i][startCol + stepColCannon * i]) jumpCount++;
+  //     }
+  //     if (jumpCount === 1) {
+  //       // Check if the end position has an opponent's piece
+  //       const endPiece = board[endRow][endCol];
+  //       return endPiece && endPiece.player !== piece.player;
+  //     }
+  //     return jumpCount === 0;
+  //   case '兵':
+  //   case '卒':
+  //     // Pawns can only move forward and capture diagonally after crossing the river
+  //     if (piece.player === 'red') {
+  //       if (endRow < 4) {
+  //         return rowDiff === 1 && colDiff === 0;
+  //       } else {
+  //         return (rowDiff === 1 && colDiff === 0) || (rowDiff === 1 && Math.abs(colDiff) === 1);
+  //       }
+  //     } else {
+  //       if (endRow >= 4) {
+  //         return rowDiff === -1 && colDiff === 0;
+  //       } else {
+  //         return (rowDiff === -1 && colDiff === 0) || (rowDiff === -1 && Math.abs(colDiff) === 1);
+  //       }
+  //     }
+  //   default:
+  //     return false;
+  // }
 };
 
 const capturePiece = (row, col) => {
@@ -211,11 +282,9 @@ const handlePieceClick = (row, col) => {
   if (!flippedPieces.has(`${row},${col}`)) {
     flipPiece(row, col)
     setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
+    setSelectedPiece(null);
     return
   }
-  
-  const piece = board[row][col];
-  if (!piece || piece.player !== currentPlayer) return;
 
   if (selectedPiece) {
     // Attempt to move the selected piece to the clicked position
@@ -224,6 +293,8 @@ const handlePieceClick = (row, col) => {
     }
     setSelectedPiece(null);
   } else {
+    const piece = board[row][col];
+    if (!piece || piece.player !== currentPlayer) return;
     // Select the piece for movement
     setSelectedPiece({ row, col });
   }
@@ -237,9 +308,15 @@ const renderPiece = (row, col) => {
   if (isFlipped) {
     player = piece.player
   } 
+  
+  let select = ""
+  if(selectedPiece && row==selectedPiece.row && col==selectedPiece.col ){
+    select = "select"
+  }
+
   return (
     <div
-      className={`piece ${player}`}
+      className={`piece ${player} ${select}`}
       onClick={() => handlePieceClick(row, col)}
     >
       {isFlipped ? piece.type : ''}
