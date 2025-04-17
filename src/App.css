@@ -15,10 +15,13 @@
 
 .chess-board {
   display: grid;
-  grid-template-columns: repeat(8, 100px);
-  grid-template-rows: repeat(4, 100px);
-  gap: 5px;
-  margin: 20px;
+  grid-template-columns: repeat(8, 12vw); /* 12vw means 12% of the viewport width */
+  grid-template-rows: repeat(8, 12vw);   /* 12vw ensures consistent square cells */
+  gap: 0.1vw;                            /* 0.5vw gap between cells */
+  margin: 0.1vw;                           /* 1vw margin around the chessboard */
+  max-width: 96vw;                       /* Ensures the chessboard doesn't overflow the viewport */
+  max-height: 96vw;                      /* Ensures the chessboard remains square */
+  /* margin: 0 auto;                        Centers the chessboard horizontally */
 }
 
 .game-info {
@@ -31,13 +34,13 @@
 }
 
 .board-cell {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  height: 100%;
   background-color: #f0d9b5;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
+  position: center;
 }
 
 .board-cell:nth-child(odd) {
@@ -45,26 +48,26 @@
 }
 
 .piece {
-  width: 80px;
-  height: 80px;
+  width: 80%;
+  height: 80%;
   background-color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 42px;
+  font-size: 5vw;
   cursor: pointer;
   transition: transform 0.3s;
 }
 
 .empty {
-  width: 80px;
-  height: 80px;
+  width: 80%;
+  height: 80%;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 42px;
+  font-size: 2vw;
   cursor: pointer;
   transition: transform 0.3s;
 }
