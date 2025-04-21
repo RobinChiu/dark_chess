@@ -5,9 +5,9 @@ const ChessBoard = () => {
   const [board, setBoard] = useState(Array(8).fill(Array(4).fill(null)));
   const [pieces, setPieces] = useState([]);
   const [flippedPieces, setFlippedPieces] = useState(new Set());
-  const [currentPlayer, setCurrentPlayer] = useState('red');
+  const [currentPlayer, setCurrentPlayer] = useState('?');
   const [gameStatus, setGameStatus] = useState('ongoing');
-  const [validMoves, setValidMoves] = useState([]);
+  // const [validMoves, setValidMoves] = useState([]);
   const [capturedPieces, setCapturedPieces] = useState({ red: [], black: [] });
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const ChessBoard = () => {
   }
 
   const initializeBoard = () => {
-    const pieceTypes = ['將', '仕', '相', '車', '馬', '砲', '兵'];
+    // const pieceTypes = ['將', '仕', '相', '車', '馬', '砲', '兵'];
     const blackPieceCounts = { '將': 1, '士': 2, '象': 2, '車': 2, '馬': 2, '包': 2, '卒': 5 };
     const redPieceCounts = { '帥': 1, '仕': 2, '相': 2, '俥': 2, '傌': 2, '炮': 2, '兵': 5 };
     const allPieces = []; 
@@ -62,12 +62,9 @@ const ChessBoard = () => {
 const flipPiece = (row, col) => {
   if (gameStatus !== 'ongoing') return;
 
-  // const piece = board[row][col];
-  // if (!piece || piece.player !== currentPlayer) return;
-
   const newFlippedPieces = new Set(flippedPieces);
   if (newFlippedPieces.has(`${row},${col}`)) {
-    // newFlippedPieces.delete(`${row},${col}`);
+    newFlippedPieces.delete(`${row},${col}`);
   } else {
     newFlippedPieces.add(`${row},${col}`);
   }
@@ -106,7 +103,7 @@ const isValidMove = (startRow, startCol, endRow, endCol) => {
 
   const rowDiff = endRow - startRow;
   const colDiff = endCol - startCol;
-  
+
   // move up, down, left, right
   if ((Math.abs(rowDiff) === 1 && colDiff===0) || (Math.abs(colDiff) === 1 && rowDiff===0)) {
     // piece2 is empty
@@ -114,14 +111,14 @@ const isValidMove = (startRow, startCol, endRow, endCol) => {
       return true;
     // piece1 and piece2 same player
     } else if (piece1.player===piece2.player) {
-      return false;
+  return false;
     // compare the piece1 and piece2 number
     } else  {
       let number1 = pieceNumber[piece1.type]
       let number2 = pieceNumber[piece2.type]
       if(number1===7 && number2===1) {
-        return true;
-      }
+      return true;
+    }
       if(number1===1 && number2===7) {
         return false;
       }
@@ -146,11 +143,11 @@ const isValidMove = (startRow, startCol, endRow, endCol) => {
       }
       for(let i=start+1; i<end; i++) {
         if(board[startRow][i]) 
-          count++;
+        count++;
       }
       if(count===1)
         return true;
-    }
+      }
     if(colDiff===0) {
       let count = 0
       let start = startRow
@@ -165,8 +162,8 @@ const isValidMove = (startRow, startCol, endRow, endCol) => {
       }
       if(count===1)
         return true;
+      }
     }
-  }
 
   return false
 };
@@ -203,13 +200,18 @@ const [selectedPiece, setSelectedPiece] = useState(null);
 const handlePieceClick = (row, col) => {
   if (gameStatus !== 'ongoing') return;
   
+  // flip the piece
   if (!flippedPieces.has(`${row},${col}`)) {
     flipPiece(row, col)
-    setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
+    if (currentPlayer==='?')
+      setCurrentPlayer(board[row][col].player === 'red' ? 'black' : 'red')
+    else
+      setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
     setSelectedPiece(null);
     return
   }
 
+  // selec and move the piece
   if (selectedPiece) {
     // Attempt to move the selected piece to the clicked position
     if (isValidMove(selectedPiece.row, selectedPiece.col, row, col)) {
@@ -241,7 +243,7 @@ const renderPiece = (row, col) => {
   } 
   
   let select = ""
-  if(selectedPiece && row==selectedPiece.row && col==selectedPiece.col ){
+  if(selectedPiece && row===selectedPiece.row && col===selectedPiece.col ){
     select = "select"
   }
 
@@ -269,7 +271,8 @@ const renderPiece = (row, col) => {
       <div className="game-info">
         <p>Current Player: {currentPlayer}</p>
         <p>Game Status: {gameStatus}</p>
-        <p>Captured Pieces: Red: {capturedPieces.red.join(', ')} | Black: {capturedPieces.black.join(', ')}</p>
+        <p>Captured Pieces: Red  : {capturedPieces.red.join(', ')}</p>
+        <p>Captured Pieces: Black: {capturedPieces.black.join(', ')}</p>
       </div>
     </div>
   );
