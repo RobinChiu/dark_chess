@@ -257,6 +257,12 @@ const renderPiece = (row, col) => {
   );
 };
 
+  let player = "?"
+  if(currentPlayer==="black")
+    player = '⚫'
+  else if(currentPlayer==="red")
+    player = '🔴'
+
   return (
     <div className="chess-board">
       {board.map((row, rowIndex) => (
@@ -269,7 +275,7 @@ const renderPiece = (row, col) => {
         </div>
       ))}
       <div className="game-info">
-        <p>Current Player: {currentPlayer}</p>
+        <p>Current Player: {player}</p>
         <p>Game Status: {gameStatus}</p>
         <p>Captured Pieces: Red  : {capturedPieces.red.join(', ')}</p>
         <p>Captured Pieces: Black: {capturedPieces.black.join(', ')}</p>
