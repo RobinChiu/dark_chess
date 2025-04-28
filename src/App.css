@@ -15,8 +15,8 @@
 
 .chess-board {
   display: grid;
-  grid-template-columns: repeat(8, 12vw); /* 12vw means 12% of the viewport width */
-  grid-template-rows: repeat(8, 12vw);   /* 12vw ensures consistent square cells */
+  grid-template-columns: repeat(8, 12vh); /* 12vw means 12% of the viewport width */
+  grid-template-rows: repeat(4, 12vh);   /* 12vw ensures consistent square cells */
   gap: 0.3vw;                            /* 0.5vw gap between cells */
   margin: 0.3vw;                           /* 1vw margin around the chessboard */
   max-width: 96vw;                       /* Ensures the chessboard doesn't overflow the viewport */
@@ -25,7 +25,7 @@
 }
 
 .game-info {
-  min-height: 5vh;
+  min-height: 20vh;
   grid-column: span 8;
   background-color: darkcyan; /* Optional: Different color for visibility */
 }
