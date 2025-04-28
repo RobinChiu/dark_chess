@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# Project Title
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+It's the code using LLM to create. Then I try to debug and modify it.
 
 ## Available Scripts
 
@@ -13,6 +13,8 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
+
+![image](https://github.com/RobinChiu/dark_chess/blob/main/image/screen.png)
 
 ### `npm test`
 
